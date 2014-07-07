@@ -1,10 +1,10 @@
 package com.danielme.blog.demo.listviewcheckbox;
 
 import java.util.List;
-
 import com.danielme.blog.demo.listviewcheckbox.R;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +31,7 @@ public class CustomArrayAdapter extends ArrayAdapter<Row>
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent)
+	public View getView(final int position, View convertView, ViewGroup parent)
 	{
 		// holder pattern
 		Holder holder = null;
@@ -70,6 +70,17 @@ public class CustomArrayAdapter extends ArrayAdapter<Row>
 				{
 					row.setChecked(isChecked);
 					changeBackground(CustomArrayAdapter.this.getContext(), fila, isChecked);
+					//desmarca todas los demás (si sólo se permite un item marcado a la vez).
+					/*Row row = null;
+					for(int i=0 ; i<getCount() ; i++)
+					{						
+						if (i != position && isChecked)   
+						{
+							row = (Row) getItem(i);
+							row.setChecked(false);								
+						}
+					}
+					notifyDataSetChanged();*/
 				}
 			}
 		});
@@ -81,16 +92,27 @@ public class CustomArrayAdapter extends ArrayAdapter<Row>
 	/**
 	 * Set the background of a row based on the value of its checkbox value. Checkbox has its own style.
 	 */
+	@SuppressLint("NewApi")
 	@SuppressWarnings("deprecation")
 	private void changeBackground(Context context, View row, boolean checked)
 	{
-		if (checked)
+		if (row != null)
 		{
-			row.setBackgroundDrawable((context.getResources().getDrawable(R.drawable.listview_selector_checked)));
-		}
-		else
-		{
-			row.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.listview_selector));
+			Drawable drawable = context.getResources().getDrawable(R.drawable.listview_selector_checked);
+			if (checked)
+			{
+				drawable = context.getResources().getDrawable(R.drawable.listview_selector_checked);
+			}
+			else
+			{
+				drawable = context.getResources().getDrawable(R.drawable.listview_selector);
+			}
+			int sdk = android.os.Build.VERSION.SDK_INT;
+			if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+			    row.setBackgroundDrawable(drawable);
+			} else {
+			    row.setBackground(drawable);
+			}
 		}
 	}
 
